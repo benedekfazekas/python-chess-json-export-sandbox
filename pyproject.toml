@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0", "chess >= 1.11.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "your_cli_tool"
+version = "0.1.0"
+description = "A command-line tool"
+authors = [{ name="Your Name", email="you@example.com" }]
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.7"
+
+[project.scripts]
+your-cli-tool = "your_cli_tool.cli:cli"
