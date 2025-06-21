@@ -1,5 +1,6 @@
 import argparse
 import chess
+from json_exporter import JsonExporter
 #from .main import main_function
 
 def parse_args():
