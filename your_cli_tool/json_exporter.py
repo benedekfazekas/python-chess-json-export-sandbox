@@ -120,9 +120,9 @@ class JsonExporter(BaseVisitor[str]):
         if self.edn_flag:
             result_string = to_edn(self.game_data)
         else:
-            result_sting = json.dumps(self.game_data, indent=self.indent)
+            result_string = json.dumps(self.game_data, indent=self.indent)
         self.reset_game()
-        return result_sting
+        return result_string
 
     def __str__(self) -> str:
         return self.result()
