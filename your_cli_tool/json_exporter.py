@@ -19,14 +19,17 @@ def _standardize_comments(comment: Union[str, list[str]]) -> List[str]:
         return comment
     return []
 
-def to_edn(obj):
+def to_edn(obj, str_as_keyword: bool = False):
     """Recursively convert Python data structures to EDN strings."""
     if isinstance(obj, dict):
-        return '{' + ' '.join(f':{k.replace("_", "-")} {to_edn(v)}' for k, v in obj.items()) + '}'
+        return '{' + ' '.join(f'{to_edn(k, True)} {to_edn(v)}' for k, v in obj.items()) + '}'
     elif isinstance(obj, list):
         return '[' + ' '.join(to_edn(x) for x in obj) + ']'
     elif isinstance(obj, str):
-        return f'"{obj}"'
+        if str_as_keyword:
+            return f':{obj.replace("_", "-")}'
+        else:
+            return f'"{obj}"'
     elif isinstance(obj, bool):
         return 'true' if obj else 'false'
     elif obj is None:
