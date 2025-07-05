@@ -1,7 +1,7 @@
 import chess
 import typing
 import json
-from chess.pgn import BaseVisitor, SKIP, SkipType
+from chess.pgn import BaseVisitor, SKIP, SkipType, NAG_GOOD_MOVE, NAG_MISTAKE, NAG_BRILLIANT_MOVE, NAG_BLUNDER, NAG_SPECULATIVE_MOVE, NAG_DUBIOUS_MOVE
 from typing import Optional, List, Union, Callable, Any
 
 if typing.TYPE_CHECKING:
@@ -34,13 +34,22 @@ def to_edn(obj):
     else:
         return str(obj)
 
+# to easily map back to NAG string representation
+NAG_TO_PGN_STRING = {NAG_GOOD_MOVE: "!",
+                     NAG_MISTAKE: "?",
+                     NAG_BRILLIANT_MOVE: "!!",
+                     NAG_BLUNDER: "??",
+                     NAG_SPECULATIVE_MOVE: "!?",
+                     NAG_DUBIOUS_MOVE: "?!"}
+
 class JsonExporter(BaseVisitor[str]):
     def __init__(self, *, headers: bool = True, comments: bool = True, variations: bool = True, edn: bool
-                 = False):
+                 = False, concise: bool = False):
         self.headers_flag = headers
         self.comments_flag = comments
         self.variations_flag = variations
         self.edn_flag = edn
+        self.indent = None if concise else 2
 
         self.reset_game()
 
@@ -92,7 +101,7 @@ class JsonExporter(BaseVisitor[str]):
             if self.current_variation:
                 if "nags" not in self.current_variation[-1]:
                     self.current_variation[-1]["nags"] = []
-                self.current_variation[-1]["nags"].append(nag)
+                self.current_variation[-1]["nags"].append({nag: NAG_TO_PGN_STRING.get(nag)})
 
     def visit_move(self, board: chess.Board, move: chess.Move) -> None:
         move_entry = {
@@ -109,9 +118,11 @@ class JsonExporter(BaseVisitor[str]):
     @override
     def result(self) -> str:
         if self.edn_flag:
-            return to_edn(self.game_data)
+            result_string = to_edn(self.game_data)
         else:
-            return json.dumps(self.game_data, indent=2)
+            result_sting = json.dumps(self.game_data, indent=self.indent)
+        self.reset_game()
+        return result_sting
 
     def __str__(self) -> str:
         return self.result()
