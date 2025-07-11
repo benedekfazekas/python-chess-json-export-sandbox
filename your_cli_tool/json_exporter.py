@@ -82,6 +82,8 @@ class JsonExporter(BaseVisitor[str]):
             return SKIP
         variation = []
         move_entry = {"variation": variation}
+        # add a fen to the last move of the prev variation
+        # self.current_variation[-1]["fen"] = board.fen()
         self.current_variation.append(move_entry)
         self.variation_stack.append(self.current_variation)
         self.current_variation = variation
@@ -112,6 +114,9 @@ class JsonExporter(BaseVisitor[str]):
             "turn": "white" if board.turn == chess.WHITE else "black",
             "san": board.san(move),
             "uci": move.uci(),
+            "fen": board.fen(),
+            "board_img": chess.svg.board(board, size=150).replace('"', '\\"')
+            #"board": board.unicode(),
         }
         self.current_variation.append(move_entry)
 
