@@ -109,13 +109,17 @@ class JsonExporter(BaseVisitor[str]):
                 self.current_variation[-1]["nags"].append({nag: NAG_TO_PGN_STRING.get(nag)})
 
     def visit_move(self, board: chess.Board, move: chess.Move) -> None:
+        # Copy the board and apply the move to get the post-move position
+        board_after = board.copy()
+        board_after.push(move)
         move_entry = {
             "move_number": board.fullmove_number,
             "turn": "white" if board.turn == chess.WHITE else "black",
             "san": board.san(move),
             "uci": move.uci(),
             "fen": board.fen(),
-            "board_img": chess.svg.board(board, size=150).replace('"', '\\"')
+            "board_img_before": chess.svg.board(board, size=250).replace('"', '\\"'),
+            "board_img_after": chess.svg.board(board_after, size=250).replace('"', '\\"'),
             #"board": board.unicode(),
         }
         self.current_variation.append(move_entry)
