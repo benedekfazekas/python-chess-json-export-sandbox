@@ -47,11 +47,12 @@ NAG_TO_PGN_STRING = {NAG_GOOD_MOVE: "!",
 
 class JsonExporter(BaseVisitor[str]):
     def __init__(self, *, headers: bool = True, comments: bool = True, variations: bool = True, edn: bool
-                 = False, concise: bool = False):
+                 = False, concise: bool = False, board_img_for_black = False):
         self.headers_flag = headers
         self.comments_flag = comments
         self.variations_flag = variations
         self.edn_flag = edn
+        self.board_img_for_black_flag = board_img_for_black
         self.indent = None if concise else 2
 
         self.reset_game()
@@ -112,14 +113,15 @@ class JsonExporter(BaseVisitor[str]):
         # Copy the board and apply the move to get the post-move position
         board_after = board.copy()
         board_after.push(move)
+        orientation = chess.BLACK if self.board_img_for_black_flag else chess.WHITE
         move_entry = {
             "move_number": board.fullmove_number,
             "turn": "white" if board.turn == chess.WHITE else "black",
             "san": board.san(move),
             "uci": move.uci(),
             "fen": board.fen(),
-            "board_img_before": chess.svg.board(board, size=250).replace('"', '\\"'),
-            "board_img_after": chess.svg.board(board_after, size=250).replace('"', '\\"'),
+            "board_img_before": chess.svg.board(board, size=250, orientation=orientation).replace('"', '\\"'),
+            "board_img_after": chess.svg.board(board_after, size=250, orientation=orientation).replace('"', '\\"'),
             #"board": board.unicode(),
         }
         self.current_variation.append(move_entry)
