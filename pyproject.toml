@@ -12,5 +12,9 @@ readme = "README.md"
 license = { file="LICENSE" }
 requires-python = ">=3.7"
 
+[tool.setuptools.packages]
+# This tells setuptools to look for packages starting in the current directory (["."])
+find = {where = ["."]}
+
 [project.scripts]
 your-cli-tool = "your_cli_tool.cli:cli"
